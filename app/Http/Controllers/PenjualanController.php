@@ -41,29 +41,33 @@ class PenjualanController extends Controller
     }
 
     public function addtemp(Request $request, $pelanggan_id){
-        $produk    = Produk::where('produk_id',$request->produk_id)->first();
-        $stoklama  = $produk->stok;
-        $temp = Temp::where('user_id',auth()->user()->user_id)
-                                ->where('produk_id',$request->produk_id)
-                                ->where('pelanggan_id',$request->pelanggan_id)
-                                ->first();
+        $produk = Produk::where('produk_id', $request->produk_id)->first();
+        $stoklama = $produk->stok;
+    
+        // Cek apakah produk sudah ada di keranjang
+        $temp = Temp::where('user_id', auth()->user()->user_id)
+                        ->where('produk_id', $request->produk_id)
+                        ->where('pelanggan_id', $request->pelanggan_id)
+                        ->first();
+    
         if ($stoklama < $request->jumlah_produk) {
-            # code...
-            return redirect()->back()->with('error','Stok tidak mencukupi');
-        }elseif($temp<>NULL){
-            return redirect()->back()->with('error','Produk sudah dipilih');
-        }else{
+            return redirect()->back()->with('error', 'Stok tidak mencukupi');
+        } elseif ($temp !== NULL) {
+            $temp->jumlah_produk += $request->jumlah_produk;
+            $temp->save();
+            return redirect()->back()->with('success', 'Jumlah produk berhasil diperbarui di keranjang');
+        } else {
             $data = [
-                'pelanggan_id'=> $request->pelanggan_id,
-                'user_id'=> $request->user_id,
-                'produk_id'=> $request->produk_id,
-                'jumlah_produk'=> $request->jumlah_produk,
+                'pelanggan_id' => $request->pelanggan_id,
+                'user_id' => $request->user_id,
+                'produk_id' => $request->produk_id,
+                'jumlah_produk' => $request->jumlah_produk,
             ];
             Temp::create($data);
-            return redirect()->back()->with('success','Produk berhasil ditambah ke keranjang');
+            return redirect()->back()->with('success', 'Produk berhasil ditambah ke keranjang');
         }
-        
     }
+    
     public function deltemp($temp_id){
         $temp = Temp::findOr($temp_id);
         $temp->delete();
