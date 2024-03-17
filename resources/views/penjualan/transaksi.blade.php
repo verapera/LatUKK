@@ -95,7 +95,7 @@
             </table>
             <form action="{{ route('bayarr',$pelanggan_id) }}" method="POST">
               @csrf
-              @if (empty($temp) && $cek == 0)
+              @if (!empty($temp) && $cek == 0)
                   
               <div class="col-md-4">
                <label for="" class="form-input mb-2">Pembayaran</label>

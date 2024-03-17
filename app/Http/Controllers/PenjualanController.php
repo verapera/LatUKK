@@ -95,11 +95,6 @@ class PenjualanController extends Controller
             // update
             Produk::where('produk_id',$item->produk_id)
                     ->update(['stok'=>$item->stok-$item->jumlah_produk]);
-            // delete
-            $tempdel = Temp::where('pelanggan_id',$item->pelanggan_id)
-                        ->where('user_id',auth()->user()->user);
-            $tempdel->delete();
-
         }
         Penjualan::create([
             'kode_penjualan'=>$nota,
@@ -108,6 +103,10 @@ class PenjualanController extends Controller
             'total_harga'=>$request->total_harga,
             'pelanggan_id'=>$request->pelanggan_id,
         ]);
+        // delete tempory
+        Temp::where('pelanggan_id', $pelanggan_id)
+         ->where('user_id', auth()->user()->user_id)
+         ->delete();
         return redirect()->route('invoice',$nota)->with('success','Transaksi success!'); 
 
     }
