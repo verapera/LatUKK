@@ -28,7 +28,7 @@ Route::group(['middleware'=>'auth'],function(){
         Route::get('showproduk/{produk_id}','showproduk')->name('showproduk');
         Route::put('updateproduk/{produk_id}','update')->name('updateproduk');
     });
-    Route::controller(PelangganController::class)->group(function(){
+    Route::controller(PelangganController::class)->middleware('petugas')->group(function(){
         Route::get('pelanggan','index')->name('pelanggan');
         Route::post('addpelanggan','create')->name('addpelanggan');
         Route::delete('deletepelanggan/{pelanggan_id}','delete')->name('deletepelanggan');

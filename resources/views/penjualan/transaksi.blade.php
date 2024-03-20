@@ -7,7 +7,6 @@
             <div class="card-body">
                 <form method="POST" action="{{ route('addtemp',$pelanggan->pelanggan_id) }}" >
                     @csrf
-                    <input type="hidden" name="user_id" value="{{auth()->user()->user_id}}">
                     <input type="hidden" name="pelanggan_id" value="{{$pelanggan->pelanggan_id}}">
                     <h5 class="fw-semibold mb-3">Pilih produk yang akan dijual</h5>
                     <div class="mt-2">
@@ -54,14 +53,12 @@
                       <td>{{ $item->nama_produk }}</td>
                       <td>{{ $item->jumlah_produk }}
                           <?php 
-                          if ($item->jumlah_produk > $item->stok) {
+                          if ($item->stok < $item->jumlah_produk) {
                             # code...
                            echo "<span class='badge bg-danger'>Stok tidak mencukupi</span>";
                            $cek = 1;
                           }
                           ?>
-                          
-                          
                       <td>Rp.{{ number_format($item->harga) }}</td>
                       <td>Rp.{{ number_format($item->harga*$item->jumlah_produk)}}</td>
                       <td>
@@ -96,7 +93,6 @@
             <form action="{{ route('bayarr',$pelanggan_id) }}" method="POST">
               @csrf
               @if ($cek == 0 && $temp->count()!==0)
-                  
               <div class="col-md-4">
                <label for="" class="form-input mb-2">Pembayaran</label>
                <input type="number" name="pembayaran" placeholder="Masukan nominal..." class="form-control" required>
@@ -108,6 +104,6 @@
             </form>
           </div>
       </div>
-      </div>
+      </div>  
 </div>
 @endsection

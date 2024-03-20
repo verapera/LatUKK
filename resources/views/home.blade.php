@@ -62,6 +62,7 @@
                 <span class="hide-menu">Produk</span>
               </a>
             </li>
+            @if (auth()->user()->level=="Petugas")
             <li class="sidebar-item">
               <a class="sidebar-link" href="/pelanggan" aria-expanded="false">
                 <span>
@@ -70,6 +71,7 @@
                 <span class="hide-menu">Pelanggan</span>
               </a>
             </li>
+            @endif
             <li class="sidebar-item">
               <a class="sidebar-link" href="/penjualan" aria-expanded="false">
                 <span>

@@ -23,6 +23,7 @@ class PenjualanController extends Controller
 
         return view('penjualan.index')->with(compact('penjualan','pelanggan'));
     }
+
     public function transaksi($pelanggan_id){
         $pelanggan = Pelanggan::findOrFail($pelanggan_id);
         $produk    = Produk::where('stok','>',0)->orderBy('nama_produk','ASC')->get();
@@ -59,7 +60,7 @@ class PenjualanController extends Controller
         } else {
             $data = [
                 'pelanggan_id' => $request->pelanggan_id,
-                'user_id' => $request->user_id,
+                'user_id' => auth()->user()->user_id,
                 'produk_id' => $request->produk_id,
                 'jumlah_produk' => $request->jumlah_produk,
             ];
@@ -67,7 +68,6 @@ class PenjualanController extends Controller
             return redirect()->back()->with('success', 'Produk berhasil ditambah ke keranjang');
         }
     }
-    
     public function deltemp($temp_id){
         $temp = Temp::findOr($temp_id);
         $temp->delete();
@@ -80,15 +80,14 @@ class PenjualanController extends Controller
         $temp      = DB::table('temps as a')
                     ->leftJoin('produks as b','a.produk_id','=','b.produk_id')
                     ->where('a.user_id',auth()->user()->user_id)
-                    ->where('a.pelanggan_id',$request->pelanggan_id)
+                    ->where('a.pelanggan_id',$pelanggan_id)
                     ->get();
-        $total = 0;
+
         foreach($temp as $item){
             if ($item->stok < $item->jumlah_produk) {
                 # code...
                 return redirect()->back()->with('error','Stok tidak mencukupi');
             }
-            $total+=$item->harga*$item->jumlah_produk;
             $data = [
                 'kode_penjualan'=> $nota,
                 'produk_id'=> $item->produk_id,
@@ -99,7 +98,7 @@ class PenjualanController extends Controller
             // update
             Produk::where('produk_id',$item->produk_id)
                     ->update(['stok'=>$item->stok-$item->jumlah_produk]);
-        }
+        } 
         Penjualan::create([
             'kode_penjualan'=>$nota,
             'tanggal_penjualan'=>date('y-m-d'),
@@ -146,9 +145,6 @@ class PenjualanController extends Controller
         TCPDF::AddPage();
         TCPDF::SetFont('helvetica','B','12');
         TCPDF::Cell(0,10,'                        MagooKasir',0,1,'L');
-        
-        
-        
         
         TCPDF::SetFont('helvetica','','10');
         TCPDF::Cell(0,7,'                                     Pusat',0,1,'L');
